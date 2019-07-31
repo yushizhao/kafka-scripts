@@ -10,7 +10,7 @@ if __name__ == "__main__":
         'security.protocol': 'SASL_PLAINTEXT',
         'sasl.mechanisms': 'PLAIN',
         'sasl.username': 'admin',
-        'sasl.password': 'admin'
+        'sasl.password': 'adminpassword'
     })
 
     c.subscribe(['test'])
