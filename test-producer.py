@@ -30,4 +30,4 @@ if __name__ == "__main__":
 
     # Wait for any outstanding messages to be delivered and delivery report
     # callbacks to be triggered.
-    p.flush()
+    p.flush(2)

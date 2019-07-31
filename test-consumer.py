@@ -5,12 +5,12 @@ if __name__ == "__main__":
 
     c = Consumer({
         'bootstrap.servers': '127.0.0.1:9094',
-        'group.id': 'mygroup',
+        'group.id': 'bob-group',
         'auto.offset.reset': 'earliest',
         'security.protocol': 'SASL_PLAINTEXT',
         'sasl.mechanisms': 'PLAIN',
-        'sasl.username': 'admin',
-        'sasl.password': 'adminpassword'
+        'sasl.username': 'bob',
+        'sasl.password': 'bobpassword'
     })
 
     c.subscribe(['test'])
