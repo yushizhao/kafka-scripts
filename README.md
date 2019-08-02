@@ -181,7 +181,7 @@ c = Consumer({
     这里 `on_assign` 中给出的 offset 是 -1001 (invalid offset). 这是 c 客户端固有的问题，详见：https://github.com/confluentinc/confluent-kafka-python/issues/406. 事实上，broker 已经把 group.id 对应的存在主题 __consumer_offsets 下的 offsets 分配给 consumer 了，只是 c 客户端的 consumer 在拉取一次数据之前都不知道这个 offset.
     
   + 关于自设 offset
-  
+
     如果想要从指定的一个 offset 开始 consume，那么就要在 `on_assign` 中设置. 方法见 `my_on_assign` 中注释掉的最后三行。
   
 + **poll**
@@ -211,6 +211,7 @@ c = Consumer({
     收到一条消息后返回一个 `confluent_kafka.Message`：
   
     https://docs.confluent.io/current/clients/confluent-kafka-python/index.html#message
+    
     没有收到消息，因为 timeout 返回时返回值为 `NoneType`.
   
   + 关于 consume(num_messages=1,timeout=-1)
