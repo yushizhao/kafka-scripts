@@ -78,6 +78,7 @@ p = Producer({
 + **produce**
 
   + 示例
+
     ```python
     def delivery_report(err, msg):
     """ Called once for each message produced to indicate delivery result.
@@ -90,35 +91,43 @@ p = Producer({
     p.produce(topic='test', value=data.encode('utf-8'), key='235235', callback=delivery_report)
     ```
   + 关于 key 
+
     决定这条消息被送去哪个 partition. 这也就是说, 如果一列消息要定序, 那么就意味着这列消息要在同一个 partition, 就可以用带同一个 key 来达到效果.
 
   + 关于 callback
+
     收到回报也不会自动执行,只有在执行 poll 或 flush 时才会执行
     
   + 关于 遇错重发
+
     message.send.max.retries 默认值为2，在此之外我们将进行手动重试发送, 保障发送成功. 当然, 这在特殊的情况下会导致消息重复以及消息乱序. 推荐设定自增主键以便 consumer 发现重复消息和跳过的消息. 
 
   + 关于 创建 topic
+
     produce 向一个不存在的 topic 时会尝试创建该 topic. 没有相应权限的话会失败.
   
 + **poll**
 
   + 示例
+
       ```python
       p.poll(timeout=0)
       ```
   
   + 关于 timeout
+
     秒单位阻塞进程, 会把之前以及阻塞时收到但还没有 callback 过的回报进行 callback. 输0时会立刻callback并返回. 推荐主进程中周期性的 poll(0) 或者用一个专门的进程.
   
 + **flush**
 
   + 示例
+
       ```python
       p.flush(timeout=60)
       ```
   
   + 与 poll 的关系
+
     flush 会连续调用 poll, 直到阻塞进程的总时间达到 timeout 值, 或者所有发出的消息都已经回报并 callback. 推荐在关闭某个 producer 前使用 flush.
 
 ### Consumer
@@ -166,10 +175,13 @@ c = Consumer({
         
     c.subscribe(['test'],on_assign=my_on_assign)
     ```
+
   + 关于初始 offset
+
     这里 `on_assign` 中给出的 offset 是 -1001 (invalid offset). 这是 c 客户端固有的问题，详见：https://github.com/confluentinc/confluent-kafka-python/issues/406. 事实上，broker 已经把 group.id 对应的存在主题 __consumer_offsets 下的 offsets 分配给 consumer 了，只是 c 客户端的 consumer 在拉取一次数据之前都不知道这个 offset.
     
   + 关于自设 offset
+  
     如果想要从指定的一个 offset 开始 consume，那么就要在 `on_assign` 中设置. 方法见 `my_on_assign` 中注释掉的最后三行。
   
 + **poll**
