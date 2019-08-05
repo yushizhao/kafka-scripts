@@ -175,6 +175,10 @@ c = Consumer({
         
     c.subscribe(['test'],on_assign=my_on_assign)
     ```
+    
+  + 关于 on_assign:
+
+    broker 接到 consumer 的订阅后返回分配给该 consumer 的 partition. 这个返回将触发 consumer 的 on_assign 回调. 另外，对一个 consumer group, broker 有时会进行 rebalance, 比如在这个 consumer group 增加或减少订阅者的时候，这时也会触发 on_assign 回调.
 
   + 关于初始 offset
 
