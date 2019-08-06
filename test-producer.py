@@ -14,8 +14,8 @@ if __name__ == "__main__":
         'bootstrap.servers': '127.0.0.1:9093,127.0.0.1:9094,127.0.0.1:9095',
         'security.protocol': 'SASL_PLAINTEXT',
         'sasl.mechanisms': 'PLAIN',
-        'sasl.username': 'alice',
-        'sasl.password': 'alicepassword'
+        'sasl.username': 'admin',
+        'sasl.password': 'adminpassword'
         })
 
     for data in ("a","b","c"):
