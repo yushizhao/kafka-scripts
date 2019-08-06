@@ -32,6 +32,8 @@ func main() {
 				} else {
 					fmt.Printf("Delivered message to %v\n", ev.TopicPartition)
 				}
+			default:
+				fmt.Println(ev.String())
 			}
 		}
 	}()
@@ -42,6 +44,7 @@ func main() {
 		p.Produce(&kafka.Message{
 			TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
 			Value:          []byte(word),
+			Key:            []byte("asd"),
 		}, nil)
 	}
 
