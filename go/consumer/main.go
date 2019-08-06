@@ -13,12 +13,12 @@ func MyRebalanceCb(c *kafka.Consumer, event kafka.Event) error {
 		return fmt.Errorf("expecting kafka.AssignedPartitions, got %T", event)
 	}
 
-	var ToBeAssigned []kafka.TopicPartition
+	var toBeAssigned []kafka.TopicPartition
 	for _, tp := range part.Partitions {
 		tp.Offset = 0
-		ToBeAssigned = append(ToBeAssigned, tp)
+		toBeAssigned = append(toBeAssigned, tp)
 	}
-	return c.Assign(ToBeAssigned)
+	return c.Assign(toBeAssigned)
 }
 
 func ReadMessages(c *kafka.Consumer) {

@@ -90,6 +90,7 @@ p = Producer({
 
     p.produce(topic='test', value=data.encode('utf-8'), key='235235', callback=delivery_report)
     ```
+
   + 关于 key 
 
     决定这条消息被送去哪个 partition. 这也就是说, 如果一列消息要定序, 那么就意味着这列消息要在同一个 partition, 就可以用带同一个 key 来达到效果.
@@ -110,9 +111,9 @@ p = Producer({
 
   + 示例
 
-      ```python
-      p.poll(timeout=0)
-      ```
+    ```python
+    p.poll(timeout=0)
+    ```
   
   + 关于 timeout
 
@@ -178,7 +179,7 @@ c = Consumer({
 
   + 关于 on_assign
 
-    broker 接到 consumer 的订阅后返回分配给该 consumer 的 partition. 这个返回将触发 consumer 的 on_assign 回调. 另外, 对一个 consumer group, broker 有时会进行 rebalance, 比如在这个 consumer group 增加或减少订阅者的时候, 这时也会触发 on_assign 回调.
+    broker 接到 consumer 的订阅后返回分配给该 consumer 的 partition. 这个返回将触发 consumer 的 `on_assign` 回调. 另外, 对一个 consumer group, broker 有时会进行 rebalance, 比如在这个 consumer group 增加或减少订阅者的时候, 这时也会触发 `on_assign` 回调.
 
   + 关于初始 offset
 
@@ -228,11 +229,12 @@ c = Consumer({
     默认配置下, poll 每收到一个消息将自动更新 offset. 即, at most once. 如果需要 at least once, 那么请关闭 `enable.auto.commit`, 并在消息处理完成后手动调用 commit().
   
   + 关于 offset storage
-     offset 将以主题 __consumer_offsets 存进 Kafka broker 中并和 group.id 关联. 一个 consumer 进行订阅时, 将自动得到它所在的 group.id 在相应主题的分配给自己的 partition 上的 offset.
+
+    offset 将以主题 __consumer_offsets 存进 Kafka broker 中并和 group.id 关联. 一个 consumer 进行订阅时, 将自动得到它所在的 group.id 在相应主题的分配给自己的 partition 上的 offset.
      
   + 关于 rebalance
     
-     在一个 consumer group 中, 即使知道没有消息也要定期进行 poll, 不然会被认为是处理能力差的 consumer 导致 broker 进行 rebalance.
+    在一个 consumer group 中, 即使知道没有消息也要定期进行 poll, 不然会被认为是处理能力差的 consumer 导致 broker 进行 rebalance.
   
 + **close**
 
