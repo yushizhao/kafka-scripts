@@ -8,7 +8,17 @@ import (
 
 func MyRebalanceCb(c *kafka.Consumer, event kafka.Event) error {
 	fmt.Println(event.String())
-	return nil
+	part, ok := event.(kafka.AssignedPartitions)
+	if !ok {
+		return fmt.Errorf("expecting kafka.AssignedPartitions, got %T", event)
+	}
+
+	var ToBeAssigned []kafka.TopicPartition
+	for _, tp := range part.Partitions {
+		tp.Offset = 0
+		ToBeAssigned = append(ToBeAssigned, tp)
+	}
+	return c.Assign(ToBeAssigned)
 }
 
 func ReadMessages(c *kafka.Consumer) {
