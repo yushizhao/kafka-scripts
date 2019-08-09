@@ -42,4 +42,4 @@ Add kafka acl.
 
 ### acl-list.sh
 
-Shoe kafka acl.
+Show kafka acl.
