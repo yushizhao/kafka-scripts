@@ -28,3 +28,9 @@ sudo make install
 g++ -o producer producer.cpp -lrdkafka++ -std=c++11
 g++ -o consumer consumer.cpp -lrdkafka++ -std=c++11
 ```
+
+## 文档
+
+https://github.com/edenhill/librdkafka/blob/master/src/rdkafka.h
+https://github.com/edenhill/librdkafka/blob/master/src-cpp/rdkafkacpp.h
+https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md
