@@ -8,10 +8,6 @@
 #include <librdkafka/rdkafkacpp.h>
 
 static bool run = true;
-static int partition_cnt = 0;
-static int verbosity = 1;
-static long msg_cnt = 0;
-static int64_t msg_bytes = 0;
 
 class ExampleEventCb : public RdKafka::EventCb {
  public:
@@ -61,21 +57,34 @@ private:
   }
 
 public:
-  void rebalance_cb (RdKafka::KafkaConsumer *consumer,
-		     RdKafka::ErrorCode err,
-                     std::vector<RdKafka::TopicPartition*> &partitions) {
-    std::cerr << "RebalanceCb: " << RdKafka::err2str(err) << ": ";
+void rebalance_cb (RdKafka::KafkaConsumer *consumer,
+        	      RdKafka::ErrorCode err,
+                  std::vector<RdKafka::TopicPartition*> &partitions) {
+        
+        part_list_print(partitions);
+        
+        if (err == RdKafka::ERR__ASSIGN_PARTITIONS) {
+            // application may load offets from arbitrary external
+            // storage here and update \p partitions
 
-    part_list_print(partitions);
+            for (unsigned int i = 0 ; i < partitions.size() ; i++) {
+                partitions[i]->set_offset(RdKafka::Topic::OFFSET_BEGINNING);
+            }
 
-    if (err == RdKafka::ERR__ASSIGN_PARTITIONS) {
-      consumer->assign(partitions);
-      partition_cnt = (int)partitions.size();
-    } else {
-      consumer->unassign();
-      partition_cnt = 0;
+            consumer->assign(partitions);
+
+        } else if (err == RdKafka::ERR__REVOKE_PARTITIONS) {
+            // Application may commit offsets manually here
+            // if auto.commit.enable=false
+
+            consumer->unassign();
+
+        } else {
+            std::cerr << "Rebalancing error:" <<
+                        RdKafka::err2str(err) << std::endl;
+            consumer->unassign();
+        }
     }
-  }
 };
 
 void msg_consume(RdKafka::Message* message, void* opaque) {
@@ -85,29 +94,23 @@ void msg_consume(RdKafka::Message* message, void* opaque) {
 
     case RdKafka::ERR_NO_ERROR:
       /* Real message */
-      msg_cnt++;
-      msg_bytes += message->len();
-      if (verbosity >= 3)
-        std::cerr << "Read msg at offset " << message->offset() << std::endl;
+      std::cerr << "Read msg at offset " << message->offset() << std::endl;
       RdKafka::MessageTimestamp ts;
       ts = message->timestamp();
-      if (verbosity >= 2 &&
-	  ts.type != RdKafka::MessageTimestamp::MSG_TIMESTAMP_NOT_AVAILABLE) {
-	std::string tsname = "?";
-	if (ts.type == RdKafka::MessageTimestamp::MSG_TIMESTAMP_CREATE_TIME)
-	  tsname = "create time";
+      if (ts.type != RdKafka::MessageTimestamp::MSG_TIMESTAMP_NOT_AVAILABLE) {
+	    std::string tsname = "?";
+	    if (ts.type == RdKafka::MessageTimestamp::MSG_TIMESTAMP_CREATE_TIME)
+	      tsname = "create time";
         else if (ts.type == RdKafka::MessageTimestamp::MSG_TIMESTAMP_LOG_APPEND_TIME)
           tsname = "log append time";
         std::cout << "Timestamp: " << tsname << " " << ts.timestamp << std::endl;
       }
-      if (verbosity >= 2 && message->key()) {
+      if (message->key()) {
         std::cout << "Key: " << *message->key() << std::endl;
       }
-      if (verbosity >= 1) {
-        printf("%.*s\n",
-               static_cast<int>(message->len()),
-               static_cast<const char *>(message->payload()));
-      }
+      printf("%.*s\n",
+            static_cast<int>(message->len()),
+            static_cast<const char *>(message->payload()));
       break;
 
     case RdKafka::ERR__UNKNOWN_TOPIC:
@@ -187,9 +190,6 @@ int main (int argc, char **argv) {
    */
   consumer->close();
   delete consumer;
-
-  std::cerr << "% Consumed " << msg_cnt << " messages ("
-            << msg_bytes << " bytes)" << std::endl;
 
   /*
    * Wait for RdKafka to decommission.
