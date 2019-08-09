@@ -130,7 +130,7 @@ int main (int argc, char **argv) {
                           const_cast<char *>(line.c_str()), line.size(),
                           /* Key */
                           const_cast<char *>(key.c_str()), key.size(),
-                          /* Timestamp (defaults to now) */
+                          /* Timestamp (A value of 0 will use the current wall-clock time.) */
                           0,
                           /* Per-message opaque value passed to
                            * delivery report */
