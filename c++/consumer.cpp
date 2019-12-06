@@ -51,7 +51,7 @@ class ExampleRebalanceCb : public RdKafka::RebalanceCb {
 private:
   static void part_list_print (const std::vector<RdKafka::TopicPartition*>&partitions){
     for (unsigned int i = 0 ; i < partitions.size() ; i++)
-      std::cerr << partitions[i]->topic() <<
+      std::cerr << "RebalanceCb:" << partitions[i]->topic() <<
 	"[" << partitions[i]->partition() << "], ";
     std::cerr << "\n";
   }
@@ -68,19 +68,23 @@ void rebalance_cb (RdKafka::KafkaConsumer *consumer,
             // storage here and update \p partitions
 
             for (unsigned int i = 0 ; i < partitions.size() ; i++) {
-                partitions[i]->set_offset(RdKafka::Topic::OFFSET_BEGINNING);
+                partitions[i]->set_offset(RdKafka::Topic::OFFSET_STORED);
             }
 
             consumer->assign(partitions);
+
+            std::cerr << "RebalanceCb: ASSIGN_PARTITIONS"  << std::endl;
 
         } else if (err == RdKafka::ERR__REVOKE_PARTITIONS) {
             // Application may commit offsets manually here
             // if auto.commit.enable=false
 
+            std::cerr << "RebalanceCb: REVOKE_PARTITIONS"  << std::endl;
+
             consumer->unassign();
 
         } else {
-            std::cerr << "Rebalancing error:" <<
+            std::cerr << "RebalanceCb error:" <<
                         RdKafka::err2str(err) << std::endl;
             consumer->unassign();
         }
@@ -149,6 +153,9 @@ int main (int argc, char **argv) {
 
     std::cerr << errstr << std::endl;
 
+    ExampleEventCb ex_event_cb;
+    conf->set("event_cb", &ex_event_cb, errstr);
+    
     ExampleRebalanceCb ex_rebalance_cb;
     conf->set("rebalance_cb", &ex_rebalance_cb, errstr);
 
